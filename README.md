@@ -17,21 +17,16 @@ of this yourself — just build and run the container below.
    sudo systemctl restart docker
    ```
 
-## Files in this folder
+## Files in this repo
 
 | File | Purpose |
 |---|---|
 | `Dockerfile` | Builds the image: CUDA base -> ROS 2 Jazzy -> Gazebo Harmonic -> MuJoCo -> GUI libs |
 | `docker-compose.yml` | How to *run* the image: GPU flag, X11 mount, workspace mount |
 | `entrypoint.sh` | Sources ROS 2 automatically every time the container starts |
-| `.env` | Your UID/GID, so files created in the container aren't owned by root |
 | `ros2_ws/src` | Your ROS 2 workspace source folder — put your packages here |
 
-> **Note:** make sure the env file in this folder is actually named `.env`
-> (with the leading dot). If it downloaded as plain `env`, rename it:
-> `mv env .env`. Docker Compose only picks it up automatically with the dot.
-
-## How the pieces fit together (so you're not just copy-pasting blindly)
+## Description
 
 **GPU access**: The `gpus: all` line in `docker-compose.yml` tells Docker
 to use the NVIDIA Container Toolkit runtime, which exposes your GPU
@@ -51,6 +46,23 @@ the container talk to the X server already running on your desktop:
   (step 1 below) — this is the part people usually forget.
 
 ## Running it
+
+### 0. Generate your `.env` (one-time, on your machine):
+Run this from the root of the repo (the folder containing
+`docker-compose.yml`):
+```bash
+echo "UID=$(id -u)" > .env
+echo "GID=$(id -g)" >> .env
+```
+This records your user and group IDs so files created in the container
+aren't owned by root on your machine. Your `.env` should contain just
+these two lines, for example (if your IDs are 1000):
+```
+UID=1000
+GID=1000
+```
+Your numbers may differ, and that's fine — they should match whatever
+`id -u` and `id -g` print on your machine.
 
 ### 1. One-time per login session:
 ```bash
@@ -135,8 +147,8 @@ each `colcon build` so the container picks up your newly built packages.)
   Toolkit prerequisite above — this is almost always the cause.
 - **Files you create in `ros2_ws` show up owned by the wrong user on your
   machine**: check `id -u` and `id -g` on your machine and make sure
-  those numbers match `UID`/`GID` in the `.env` file, then rebuild with
-  `docker compose up -d --build`.
+  those numbers match `UID`/`GID` in your `.env` file (or regenerate it
+  with step 0 above), then rebuild with `docker compose up -d --build`.
 - **`xhost +local:docker` feels too permissive**: use
   `xhost +si:localuser:$(whoami)` instead — it only trusts your own user
   account rather than all local containers.
