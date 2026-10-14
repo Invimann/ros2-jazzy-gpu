@@ -1,0 +1,36 @@
+services:
+  ros2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_UID: ${UID:-1000}
+        USER_GID: ${GID:-1000}
+    image: ros2-jazzy-gpu:latest
+    container_name: ros2_jazzy_gpu
+
+    # --- GPU access (requires NVIDIA Container Toolkit on the host) --------
+    gpus: all
+
+    # --- Networking ----------------------------------------------------
+    # host networking makes ROS 2 DDS discovery between nodes on the same
+    # machine "just work" without extra config, and is the standard
+    # approach for local ROS 2 docker development.
+    network_mode: host
+    ipc: host
+
+    # --- GUI (X11) forwarding -------------------------------------------
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # Mount your ROS 2 workspace source folder from the host.
+      # Everything under ./ros2_ws/src on the host shows up at
+      # /home/ros/ros2_ws/src inside the container.
+      - ./ros2_ws:/home/ros/ros2_ws
+
+    stdin_open: true
+    tty: true
