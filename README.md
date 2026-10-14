@@ -7,8 +7,8 @@ of this yourself — just build and run the container below.
 
 ## Prerequisites (one-time, on your machine)
 
-1. Docker + Docker Compose v2 installed.
-2. Your NVIDIA driver installed (should already be the case).
+1. Docker + Docker Compose v2 installed (from [this link](https://docs.docker.com/engine/install/)).
+2. Your NVIDIA driver installed (should already be the case, but check [this](https://docs.nvidia.com/cuda/cuda-quick-start-guide/index.html)).
 3. **NVIDIA Container Toolkit** installed and configured — this is what
    lets the container use your GPU:
    ```bash
