@@ -31,6 +31,10 @@ services:
       # Everything under ./ros2_ws/src on the host shows up at
       # /home/ros/ros2_ws/src inside the container.
       - ./ros2_ws:/home/ros/ros2_ws
+      # JdeRobot RoboticsInfrastructure clone. Needed because
+      # ros2_ws/src/custom_robots links into it (via ln), so the link
+      # targets must exist inside the container too.
+      - ./RoboticsInfrastructure:/home/ros/RoboticsInfrastructure
 
     stdin_open: true
     tty: true
